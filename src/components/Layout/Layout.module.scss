@@ -1,0 +1,14 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0 25%;
+  background: var(--gray-300);
+
+  .children {
+    flex-grow: 1;
+    padding: 8px 24px;
+
+    background: var(--white);
+  }
+}

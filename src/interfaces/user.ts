@@ -1,11 +1,11 @@
-enum UserRole {
+export enum UserRole {
   USER = 'USER',
   ADMIN = 'ADMIN',
 }
 
-interface IUser {
+export interface IUser {
   name: string
-  organization: string
+  company: string
   email: string
   role: UserRole
 }

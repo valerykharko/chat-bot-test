@@ -12,3 +12,8 @@ interface ISender {
   type: SenderEnum
   email?: string
 }
+
+export interface IConversationTree {
+  question: string
+  answers: string[]
+}

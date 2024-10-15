@@ -2,99 +2,121 @@ import React, { useState } from 'react'
 
 import { Box, Button, TextField, Typography, Stack, Modal } from '@mui/material'
 
+import { signInRequest } from '@/api/requests/auth.ts'
+
+import { validateInputs } from '@/utils/validation.ts'
+
+import { IFormData, IValidationErrors } from '@/interfaces/form.ts'
+
+import styles from './SignIn.module.scss'
+
 interface ISignUpProps {
   open: boolean
   onClose: () => void
 }
 
 export default function SignIn({ open, onClose }: ISignUpProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [emailError, setEmailError] = useState(false)
-  const [passwordError, setPasswordError] = useState(false)
+  const [mode, setMode] = useState<'singIn' | 'singUp'>('singIn')
+  const [formData, setFormData] = useState<IFormData>({
+    name: '',
+    company: '',
+    email: '',
+    password: '',
+  })
+  const [errors, setErrors] = useState<IValidationErrors>({
+    name: '',
+    company: '',
+    email: '',
+    password: '',
+  })
 
-  console.log('open', open)
-
-  const validateInputs = () => {
-    let isValid = true
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError(true)
-      isValid = false
-    } else {
-      setEmailError(false)
-    }
-
-    if (!password || password.length < 6) {
-      setPasswordError(true)
-      isValid = false
-    } else {
-      setPasswordError(false)
-    }
-
-    return isValid
+  const onChangeMode = () => {
+    setMode((prevMode) => (prevMode === 'singUp' ? 'singIn' : 'singUp'))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (validateInputs()) {
-      console.log('Email:', email)
-      console.log('Password:', password)
-      onClose()
+
+    const validationErrors = validateInputs(formData, mode)
+    setErrors(validationErrors)
+
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        // const { data } = await signInRequest(formData.email, formData.password)
+        // localStorage.setItem('token', data.token)
+        // localStorage.setItem('userData', data.user)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        onClose()
+      }
     }
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
   }
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: 24,
-          width: 300,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <Typography variant="h6">Sing Up</Typography>
+      <Box className={styles.container}>
+        <Typography variant="h6">
+          {mode === 'singIn' ? 'Sing In' : 'Sing Up'}
+        </Typography>
 
         <form onSubmit={handleSubmit}>
+          {mode === 'singUp' && (
+            <>
+              <TextField
+                className={styles.input}
+                label="Name"
+                variant="outlined"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                error={!!errors.name}
+                helperText={errors.name}
+              />
+              <TextField
+                className={styles.input}
+                label="Company"
+                variant="outlined"
+                value={formData.company}
+                onChange={(e) => handleInputChange('company', e.target.value)}
+                error={!!errors.company}
+                helperText={errors.company}
+              />
+            </>
+          )}
           <TextField
-            fullWidth
+            className={styles.input}
             label="Email"
             variant="outlined"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={emailError}
-            helperText={emailError ? 'Invalid email address' : ''}
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <TextField
-            sx={{ marginTop: 1 }}
-            fullWidth
+            className={styles.input}
             label="Password"
             variant="outlined"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={passwordError}
-            helperText={
-              passwordError ? 'Password must be at least 6 characters' : ''
-            }
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+            error={!!errors.password}
+            helperText={errors.password}
           />
+
           <Button
+            className={styles.submitBtn}
             type="submit"
-            fullWidth
             variant="contained"
-            sx={{ marginTop: 2 }}
           >
-            Login
+            {mode === 'singIn' ? 'Sing In' : 'Sing Up'}
           </Button>
         </form>
 
@@ -104,9 +126,13 @@ export default function SignIn({ open, onClose }: ISignUpProps) {
           alignItems="center"
           gap={1}
         >
-          <Typography variant="body2">Don't have an account?</Typography>
-          <Button variant="text" onClick={() => {}}>
-            Sign up
+          <Typography variant="body2">
+            {mode === 'singIn'
+              ? "Don't have an account?"
+              : 'Already have an account?'}
+          </Typography>
+          <Button variant="text" onClick={onChangeMode}>
+            {mode === 'singIn' ? 'Sing Up' : 'Sing In'}
           </Button>
         </Stack>
       </Box>

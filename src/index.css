@@ -11,13 +11,29 @@
   --gray-900: #3b3b3b;
   --black: #000000;
   --blue: #00bfff;
+  --blue-dark: #45b4e9;
   --purple: #bf00ff;
 }
 
 body {
-  width: 100vw;
   height: 100vh;
 
   margin: 0;
-  overflow: hidden;
+  overflow-y: auto;
+
+  background: var(--gray-300);
+}
+
+button {
+  border: none;
+  outline: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+input,
+textarea {
+  border: none;
+  outline: none;
 }
